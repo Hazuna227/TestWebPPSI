@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Manajemen Stok Barang</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            font-weight: 500;
+        }
+
+        .upload-section {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ccc;
+        }
+
+        .btn-submit {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-submit:hover {
+            background-color: #e0e7ff;
+        }
+
+        input[type="file"] {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .custom-upload {
+            display: inline-block;
+            background-color: #e0e7ff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-top: 10px;
+        }
+
+        #file-name {
+            margin-left: 15px;
+            font-style: italic;
+            color: #555;
+        }
+
+        #previewTable {
+            margin-top: 30px;
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+        }
+
+        #previewTable th,
+        #previewTable td {
+            padding: 10px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+
+        #previewTable th {
+            background-color: #e0e7ff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="user-info">
+                <a href="profil.html" style="text-decoration: none; color: inherit;">
+                    <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Profil" class="profile-icon">
+                    <h2 style="margin-top: 5px;">Hermanto</h2>
+                </a>
+                <hr>
+            </div>
+            <nav>
+                <a href="index.html">🏠 Dashboard</a>
+
+                <div class="menu-section">
+                    <p class="menu-title">Manajemen Penjualan</p>
+                    <ul class="submenu">
+                        <li><a href="penjualan.html">📝 Masukkan Penjualan</a></li>
+                        <li><a href="riwayat_penjualan.html">📋 Riwayat Penjualan</a></li>
+                    </ul>
+                </div>
+
+                <div class="menu-section">
+                    <p class="menu-title">Manajemen Stok Barang</p>
+                    <ul class="submenu">
+                        <li><a href="stok.html" class="active">📦 Masukkan Stok</a></li>
+                        <li><a href="lihat_stok.html">📑 Lihat Daftar Stok</a></li>
+                    </ul>
+                </div>
+
+                <div class="menu-section">
+                    <p class="menu-title">Laporan</p>
+                    <ul class="submenu">
+                        <li><a href="laporan_penjualan.html">📈 Laporan Penjualan</a></li>
+                        <li><a href="laporan_stok.html">📊 Laporan Stok Barang</a></li>
+                    </ul>
+                </div>
+                <div class="menu-section">
+                    <p class="menu-title">Bantuan</p>
+                    <ul class="submenu">
+                        <li><a href="bantuan.html">📝 Kirim Keluhan</a></li>
+                        <li><a href="balasan_keluhan.html">💬 Lihat Balasan Keluhan</a></li>
+                    </ul>
+                </div>
+                <div class="logout-section">
+                    <a href="login.html" class="btn-logout">🔒 keluar</a>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="header-bar">
+                <h1 class="judul-dashboard">Masukkan Stok Barang</h1>
+                <div class="logo-perusahaan">
+                    <span>PT. Surya Mas Agung</span>
+                    <img src="Logo PT Surya Mas Agung.webp" alt="Logo" class="logo-img">
+                </div>
+            </div>
+
+            <form>
+                <div class="form-group">
+                    <label for="nama_barang">Nama Barang</label>
+                    <input type="text" id="nama_barang" name="nama_barang" placeholder="Contoh: Ban Mobil 185/70" />
+                </div>
+
+                <div class="form-group">
+                    <label for="jumlah">Jumlah</label>
+                    <input type="number" id="jumlah" name="jumlah" placeholder="Contoh: 50" />
+                </div>
+
+                <div class="form-group">
+                    <label for="kategori">Kategori</label>
+                    <select id="kategori" name="kategori">
+                        <option value="">Pilih Kategori</option>
+                        <option value="Mobil">Mobil</option>
+                        <option value="Motor">Motor</option>
+                        <option value="Truk">Truk</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="tanggal">Tanggal Masuk</label>
+                    <input type="date" id="tanggal" name="tanggal" />
+                </div>
+
+                <button type="submit" class="btn-submit">💾 Simpan</button>
+            </form>
+
+            <div class="upload-section">
+                <h2>📤 Unggah Stok dari Berkas Excel</h2>
+                <form enctype="multipart/form-data" method="post" action="#">
+                    <div class="form-group">
+                        <label for="file_excel">Pilih Berkas Excel (.xlsx)</label>
+                        <input type="file" id="file_excel" name="file_excel" accept=".xlsx, .xls" hidden>
+                        <label for="file_excel" class="custom-upload">📁 Pilih Berkas</label>
+                        <span id="file-name">Belum ada Berkas</span>
+                    </div>
+                    <button type="submit" class="btn-submit">📤 Unggah Excel</button>
+                </form>
+
+                <table id="previewTable"></table>
+            </div>
+
+        </main>
+    </div>
+    <script>
+        document.getElementById('file_excel').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Tampilkan nama file
+            document.getElementById('file-name').textContent = file.name;
+
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                const data = new Uint8Array(event.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const sheetName = workbook.SheetNames[0];
+                const sheet = workbook.Sheets[sheetName];
+                const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+                let html = '<thead><tr>';
+                json[0].forEach(header => {
+                    html += `<th>${header}</th>`;
+                });
+                html += '</tr></thead><tbody>';
+
+                for (let i = 1; i < json.length; i++) {
+                    html += '<tr>';
+                    json[i].forEach(cell => {
+                        html += `<td>${cell ?? ''}</td>`;
+                    });
+                    html += '</tr>';
+                }
+
+                html += '</tbody>';
+                document.getElementById('previewTable').innerHTML = html;
+            };
+            reader.readAsArrayBuffer(file);
+        });
+    </script>
+
+</body>
+
+</html>

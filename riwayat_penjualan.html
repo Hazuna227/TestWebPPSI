@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Riwayat Penjualan</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+
+    <style>
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .table-responsive table {
+            min-width: 800px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 24px;
+            width: 100%;
+            max-width: 420px;
+            /* Biar tidak terlalu besar di layar kecil */
+            border-radius: 12px;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .modal-header {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .modal-body input {
+            width: 100%;
+            margin-bottom: 14px;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+            /* Tambahkan ini agar padding tidak melebar ke luar box */
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn-cancel,
+        .btn-ok {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-cancel {
+            background-color: #e5e7eb;
+            color: #374151;
+        }
+
+        .btn-ok {
+            background-color: #3b82f6;
+            color: white;
+        }
+    </style>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="user-info">
+                <a href="profil.html" style="text-decoration: none; color: inherit;">
+                    <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Profil" class="profile-icon">
+                    <h2 style="margin-top: 5px;">Hermanto</h2>
+                </a>
+                <hr>
+            </div>
+            <nav>
+                <a href="index.html">🏠 Dashboard</a>
+
+                <div class="menu-section">
+                    <p class="menu-title">Manajemen Penjualan</p>
+                    <ul class="submenu">
+                        <li><a href="penjualan.html" class="active">📝 Masukkan Penjualan</a></li>
+                        <li><a href="riwayat_penjualan.html">📋 Riwayat Penjualan</a></li>
+                    </ul>
+                </div>
+
+                <div class="menu-section">
+                    <p class="menu-title">Manajemen Stok Barang</p>
+                    <ul class="submenu">
+                        <li><a href="stok.html">📦 Masukkan Stok</a></li>
+                        <li><a href="lihat_stok.html">📑 Lihat Daftar Stok</a></li>
+                    </ul>
+                </div>
+
+                <div class="menu-section">
+                    <p class="menu-title">Laporan</p>
+                    <ul class="submenu">
+                        <li><a href="laporan_penjualan.html">📈 Laporan Penjualan</a></li>
+                        <li><a href="laporan_stok.html">📊 Laporan Stok Barang</a></li>
+                    </ul>
+                </div>
+                <div class="menu-section">
+                    <p class="menu-title">Bantuan</p>
+                    <ul class="submenu">
+                        <li><a href="bantuan.html">📝 Kirim Keluhan</a></li>
+                        <li><a href="balasan_keluhan.html">💬 Lihat Balasan Keluhan</a></li>
+                    </ul>
+                </div>
+                <div class="logout-section">
+                    <a href="login.html" class="btn-logout">🔒 keluar</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="header-bar">
+                <h1 class="judul-dashboard">Riwayat Penjualan</h1>
+                <div class="logo-perusahaan">
+                    <span>PT. Surya Mas Agung</span>
+                    <img src="Logo PT Surya Mas Agung.webp" alt="Logo" class="logo-img">
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table id="tabelPenjualan" class="display">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama Barang</th>
+                            <th>Kategori</th>
+                            <th>Jumlah</th>
+                            <th>Tanggal</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Ban Mobil 185/70</td>
+                            <td>Mobil</td>
+                            <td>50</td>
+                            <td>2025-07-01</td>
+                            <td>
+                                <div class="action-buttons"><button class="btn-edit">Edit</button><button
+                                        class="btn-delete">Hapus</button></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Ban Motor 90/80</td>
+                            <td>Motor</td>
+                            <td>30</td>
+                            <td>2025-07-04</td>
+                            <td>
+                                <div class="action-buttons"><button class="btn-edit">Edit</button><button
+                                        class="btn-delete">Hapus</button></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Ban Truk 9.00R20</td>
+                            <td>Truk</td>
+                            <td>20</td>
+                            <td>2025-06-15</td>
+                            <td>
+                                <div class="action-buttons"><button class="btn-edit">Edit</button><button
+                                        class="btn-delete">Hapus</button></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>Ban Mobil 195/65</td>
+                            <td>Mobil</td>
+                            <td>45</td>
+                            <td>2025-07-10</td>
+                            <td>
+                                <div class="action-buttons"><button class="btn-edit">Edit</button><button
+                                        class="btn-delete">Hapus</button></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>Ban Motor 80/90</td>
+                            <td>Motor</td>
+                            <td>25</td>
+                            <td>2025-06-20</td>
+                            <td>
+                                <div class="action-buttons"><button class="btn-edit">Edit</button><button
+                                        class="btn-delete">Hapus</button></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>Ban Truk 10.00R20</td>
+                            <td>Truk</td>
+                            <td>15</td>
+                            <td>2025-07-03</td>
+                            <td>
+                                <div class="action-buttons"><button class="btn-edit">Edit</button><button
+                                        class="btn-delete">Hapus</button></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>7</td>
+                            <td>Ban Mobil 175/70</td>
+                            <td>Mobil</td>
+                            <td>70</td>
+                            <td>2025-05-15</td>
+                            <td>
+                                <div class="action-buttons"><button class="btn-edit">Edit</button><button
+                                        class="btn-delete">Hapus</button></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>8</td>
+                            <td>Ban Motor 100/80</td>
+                            <td>Motor</td>
+                            <td>20</td>
+                            <td>2025-07-06</td>
+                            <td>
+                                <div class="action-buttons"><button class="btn-edit">Edit</button><button
+                                        class="btn-delete">Hapus</button></div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Edit Data Penjualan</div>
+            <div class="modal-body">
+                <input type="text" id="editNama" placeholder="Nama Barang">
+                <input type="text" id="editKategori" placeholder="Kategori">
+                <input type="number" id="editJumlah" placeholder="Jumlah">
+                <input type="date" id="editTanggal" placeholder="Tanggal">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeModal()">Batal</button>
+                <button class="btn-ok" onclick="confirmEdit()">OK</button>
+            </div>
+        </div>
+    </div>
+    <!-- Tambahan Modal Konfirmasi Hapus -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Konfirmasi Hapus</div>
+            <div class="modal-body">
+                <p>Apakah Anda yakin ingin menghapus data ini?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeDeleteModal()">Batal</button>
+                <button class="btn-ok" onclick="confirmDelete()">Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentRow = null;
+        let rowToDelete = null;
+        let table;
+
+        $(document).ready(function () {
+            // Inisialisasi DataTable hanya sekali
+            table = $('#tabelPenjualan').DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/id.json'
+                },
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        text: '📥 Unduh Excel',
+                        title: 'Riwayat_Penjualan',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4]
+                        }
+                    }
+                ]
+            });
+
+            // Tombol Edit
+            $('.btn-edit').on('click', function () {
+                const row = $(this).closest('tr');
+                currentRow = row;
+
+                $('#editNama').val(row.find('td:eq(1)').text());
+                $('#editKategori').val(row.find('td:eq(2)').text());
+                $('#editJumlah').val(row.find('td:eq(3)').text());
+                $('#editTanggal').val(row.find('td:eq(4)').text());
+
+                $('#editModal').fadeIn();
+            });
+
+            // Tombol Hapus
+            $('.btn-delete').on('click', function () {
+                rowToDelete = $(this).closest('tr');
+                $('#deleteModal').fadeIn();
+            });
+        });
+
+        function closeModal() {
+            $('#editModal').fadeOut();
+        }
+
+        function closeDeleteModal() {
+            $('#deleteModal').fadeOut();
+        }
+
+        function confirmEdit() {
+            if (currentRow) {
+                currentRow.find('td:eq(1)').text($('#editNama').val());
+                currentRow.find('td:eq(2)').text($('#editKategori').val());
+                currentRow.find('td:eq(3)').text($('#editJumlah').val());
+                currentRow.find('td:eq(4)').text($('#editTanggal').val());
+            }
+
+            alert('Edit selesai!');
+            closeModal();
+        }
+
+        function confirmDelete() {
+            if (rowToDelete) {
+                table.row(rowToDelete).remove().draw(); // Hapus pakai API DataTable
+                rowToDelete = null;
+            }
+            $('#deleteModal').fadeOut();
+            alert('Data berhasil dihapus!');
+        }
+    </script>
+
+
+</body>
+
+</html>

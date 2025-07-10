@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Laporan Stok Barang</title>
+    <link rel="stylesheet" href="style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css" />
+
+    <style>
+        .filter-box {
+            margin-bottom: 20px;
+        }
+
+        .filter-box label {
+            font-weight: 500;
+            margin-right: 10px;
+        }
+
+        .filter-box select,
+        .filter-box input {
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            margin-right: 10px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+    </style>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="user-info">
+                <a href="profil.html" style="text-decoration: none; color: inherit;">
+                    <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Profil" class="profile-icon">
+                    <h2 style="margin-top: 5px;">Hermanto</h2>
+                </a>
+                <hr>
+            </div>
+            <nav>
+                <a href="index.html" class="active">
+                    🏠 Dashboard
+                </a>
+
+                <div class="menu-section">
+                    <p class="menu-title">Manajemen Penjualan</p>
+                    <ul class="submenu">
+                        <li><a href="penjualan.html">📝 Masukkan Penjualan</a></li>
+                        <li><a href="riwayat_penjualan.html">📋 Riwayat Penjualan</a></li>
+                    </ul>
+                </div>
+
+                <div class="menu-section">
+                    <p class="menu-title">Manajemen Stok Barang</p>
+                    <ul class="submenu">
+                        <li><a href="stok.html">📦 Masukkan Stok</a></li>
+                        <li><a href="lihat_stok.html">📑 Lihat Daftar Stok</a></li>
+                    </ul>
+                </div>
+
+                <div class="menu-section">
+                    <p class="menu-title">Laporan</p>
+                    <ul class="submenu">
+                        <li><a href="laporan_penjualan.html">📈 Laporan Penjualan</a></li>
+                        <li><a href="laporan_stok.html">📊 Laporan Stok Barang</a></li>
+                    </ul>
+                </div>
+                <div class="menu-section">
+                    <p class="menu-title">Bantuan</p>
+                    <ul class="submenu">
+                        <li><a href="bantuan.html">📝 Kirim Keluhan</a></li>
+                        <li><a href="balasan_keluhan.html">💬 Lihat Balasan Keluhan</a></li>
+                    </ul>
+                </div>
+                <div class="logout-section">
+                    <a href="login.html" class="btn-logout">🔒 Keluar</a>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="header-bar">
+                <h1 class="judul-dashboard">Laporan Stok Barang</h1>
+                <div class="logo-perusahaan">
+                    <span>PT. Surya Mas Agung</span>
+                    <img src="Logo PT Surya Mas Agung.webp" alt="Logo" class="logo-img">
+                </div>
+            </div>
+
+            <div class="filter-box">
+                <label for="tipeFilter">Filter berdasarkan:</label>
+                <select id="tipeFilter">
+                    <option value="semua">Semua</option>
+                    <option value="tanggal">Per Hari</option>
+                    <option value="bulan">Per Bulan</option>
+                    <option value="tahun">Per Tahun</option>
+                </select>
+                <input type="date" id="inputTanggal" style="display:none;" />
+                <select id="inputBulan" style="display:none;">
+                    <option value="2025-07">Juli 2025</option>
+                    <option value="2025-06">Juni 2025</option>
+                </select>
+                <select id="inputTahun" style="display:none;">
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                </select>
+            </div>
+
+            <div class="table-container">
+                <table id="laporanStok" class="display nowrap" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama Barang</th>
+                            <th>Kategori</th>
+                            <th>Jumlah Masuk</th>
+                            <th>Jumlah Keluar</th>
+                            <th>Sisa Stok</th>
+                            <th>Tanggal Masuk</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-tanggal="2025-07-01">
+                            <td>1</td>
+                            <td>Ban Mobil 185/70</td>
+                            <td>Mobil</td>
+                            <td>100</td>
+                            <td>60</td>
+                            <td>40</td>
+                            <td>2025-07-01</td>
+                        </tr>
+                        <tr data-tanggal="2025-07-05">
+                            <td>2</td>
+                            <td>Ban Motor 90/80</td>
+                            <td>Motor</td>
+                            <td>80</td>
+                            <td>30</td>
+                            <td>50</td>
+                            <td>2025-07-05</td>
+                        </tr>
+                        <tr data-tanggal="2025-06-10">
+                            <td>3</td>
+                            <td>Ban Truk 9.00R20</td>
+                            <td>Truk</td>
+                            <td>60</td>
+                            <td>20</td>
+                            <td>40</td>
+                            <td>2025-06-10</td>
+                        </tr>
+                        <tr data-tanggal="2025-07-12">
+                            <td>4</td>
+                            <td>Ban Mobil 195/65</td>
+                            <td>Mobil</td>
+                            <td>90</td>
+                            <td>45</td>
+                            <td>45</td>
+                            <td>2025-07-12</td>
+                        </tr>
+                        <tr data-tanggal="2025-06-25">
+                            <td>5</td>
+                            <td>Ban Motor 80/90</td>
+                            <td>Motor</td>
+                            <td>70</td>
+                            <td>25</td>
+                            <td>45</td>
+                            <td>2025-06-25</td>
+                        </tr>
+                        <tr data-tanggal="2025-07-03">
+                            <td>6</td>
+                            <td>Ban Truk 10.00R20</td>
+                            <td>Truk</td>
+                            <td>50</td>
+                            <td>15</td>
+                            <td>35</td>
+                            <td>2025-07-03</td>
+                        </tr>
+                        <tr data-tanggal="2025-05-15">
+                            <td>7</td>
+                            <td>Ban Mobil 175/70</td>
+                            <td>Mobil</td>
+                            <td>120</td>
+                            <td>70</td>
+                            <td>50</td>
+                            <td>2025-05-15</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            const table = $('#laporanStok').DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/id.json'
+                },
+                scrollX: true,
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        text: '📥 Unduh Excel',
+                        title: 'Laporan_Stok_Barang',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4, 5, 6] // Kolom 0-6 (semua kolom)
+                        }
+                    }
+                ]
+            });
+
+            $('#tipeFilter').on('change', function () {
+                $('#inputTanggal, #inputBulan, #inputTahun').hide();
+                const tipe = $(this).val();
+
+                if (tipe === 'tanggal') $('#inputTanggal').show();
+                if (tipe === 'bulan') $('#inputBulan').show();
+                if (tipe === 'tahun') $('#inputTahun').show();
+
+                filterTable();
+            });
+
+            $('#inputTanggal, #inputBulan, #inputTahun').on('change', filterTable);
+
+            function filterTable() {
+                const tipe = $('#tipeFilter').val();
+                const tanggal = $('#inputTanggal').val();
+                const bulan = $('#inputBulan').val();
+                const tahun = $('#inputTahun').val();
+
+                $('#laporanStok tbody tr').each(function () {
+                    const rowTanggal = $(this).data('tanggal');
+                    let tampil = true;
+
+                    if (tipe === 'tanggal' && tanggal) tampil = rowTanggal === tanggal;
+                    if (tipe === 'bulan' && bulan) tampil = rowTanggal.startsWith(bulan);
+                    if (tipe === 'tahun' && tahun) tampil = rowTanggal.startsWith(tahun);
+                    if (tipe === 'semua') tampil = true;
+
+                    $(this).toggle(tampil);
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
