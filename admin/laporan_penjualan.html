@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Laporan Penjualan</title>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f4f6f9;
+        }
+
+        .container {
+            display: flex;
+        }
+
+        .sidebar {
+            width: 220px;
+            background-color: #1e3a8a;
+            color: white;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .sidebar h2 {
+            font-size: 20px;
+            margin-bottom: 30px;
+        }
+
+        .sidebar nav a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+        }
+
+        h1 {
+            color: #1e3a8a;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        select,
+        input[type="date"] {
+            padding: 8px;
+            font-size: 14px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        .dataTables_wrapper {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+            overflow-x: auto;
+            margin-bottom: 30px;
+        }
+
+        table.dataTable thead {
+            background-color: #1e3a8a;
+            color: white;
+        }
+
+        canvas {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter {
+            margin-bottom: 15px;
+        }
+
+        .dataTables_wrapper .dataTables_filter {
+            float: right;
+        }
+
+        .tombol-unduh {
+            background: linear-gradient(90deg, #2563eb, #3b82f6);
+            color: white;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            height: 40px;
+            margin-bottom: 10px;
+        }
+
+        .tombol-unduh:hover {
+            background: linear-gradient(90deg, #1e40af, #2563eb);
+        }
+
+        table.dataTable {
+            font-size: 13px;
+            /* Ukuran font isi tabel */
+        }
+
+        table.dataTable th {
+            font-size: 13px;
+            /* Ukuran font header */
+            white-space: nowrap;
+        }
+
+        table.dataTable td {
+            font-size: 13px;
+            /* Ukuran font data */
+            white-space: nowrap;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>Admin Panel</h2>
+            <nav>
+                <a href="index.html">🏠 Dashboard</a>
+                <a href="stok.html">📦 Stok</a>
+                <a href="penjualan.html">📈 Penjualan</a>
+                <a href="keluhan.html">💬 Data keluhan</a>
+                <a href="data_karyawan.html">👥 Data Karyawan</a>
+                <a href="laporan_penjualan.html">📊 Laporan</a>
+                <a href="\TestWebsitePPSI\karyawan\login.html">🔒 Logout</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <h1>Laporan Penjualan</h1>
+
+            <div class="form-group">
+                <label for="cabangSelect">Pilih Cabang:</label>
+                <select id="cabangSelect">
+                    <option value="">-- Pilih Cabang --</option>
+                    <option value="pontianak">Cabang Pontianak</option>
+                    <option value="singkawang">Cabang Singkawang</option>
+                </select>
+            </div>
+
+            <!-- PONTIANAK -->
+            <div id="pontianak" class="laporan-section" style="display: none;">
+                <button class="tombol-unduh"
+                    onclick="exportTableToExcel('tabelPontianak', 'Laporan_Penjualan_Pontianak')">⬇️ Unduh
+                    Excel</button>
+                <table id="tabelPontianak" class="display" style="width: 100%">
+                    <thead>
+                        <tr>
+                            <th>Nama Barang</th>
+                            <th>Kategori</th>
+                            <th>Jumlah</th>
+                            <th>Tanggal</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+
+                <div class="form-group">
+                    <label>Filter Grafik:</label>
+                    <select id="filterTypePontianak">
+                        <option value="daily">Per Hari</option>
+                        <option value="monthly">Per Bulan</option>
+                        <option value="yearly">Per Tahun</option>
+                    </select>
+                    <input type="date" id="filterDatePontianak" style="display: none" />
+                    <select id="filterBulanPontianak" style="display: none;">
+                        <option value="">-- Bulan --</option>
+                        <option value="01">Januari</option>
+                        <option value="02">Februari</option>
+                        <option value="03">Maret</option>
+                        <option value="04">April</option>
+                        <option value="05">Mei</option>
+                        <option value="06">Juni</option>
+                        <option value="07">Juli</option>
+                        <option value="08">Agustus</option>
+                        <option value="09">September</option>
+                        <option value="10">Oktober</option>
+                        <option value="11">November</option>
+                        <option value="12">Desember</option>
+                    </select>
+                    <select id="filterYearPontianak" style="display: none;">
+                        <option value="">-- Tahun --</option>
+                        <option value="2024">2024</option>
+                        <option value="2025">2025</option>
+                    </select>
+                </div>
+                <canvas id="chartPontianak" height="100"></canvas>
+            </div>
+
+            <!-- SINGKAWANG -->
+            <div id="singkawang" class="laporan-section" style="display: none;">
+                <button class="tombol-unduh"
+                    onclick="exportTableToExcel('tabelSingkawang', 'Laporan_Penjualan_Singkawang')">⬇️ Unduh
+                    Excel</button>
+                <table id="tabelSingkawang" class="display" style="width: 100%">
+                    <thead>
+                        <tr>
+                            <th>Nama Barang</th>
+                            <th>Kategori</th>
+                            <th>Jumlah</th>
+                            <th>Tanggal</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+
+                <div class="form-group">
+                    <label>Filter Grafik:</label>
+                    <select id="filterTypeSingkawang">
+                        <option value="daily">Per Hari</option>
+                        <option value="monthly">Per Bulan</option>
+                        <option value="yearly">Per Tahun</option>
+                    </select>
+                    <input type="date" id="filterDateSingkawang" style="display: none" />
+                    <select id="filterBulanSingkawang" style="display: none;">
+                        <option value="">-- Bulan --</option>
+                        <option value="01">Januari</option>
+                        <option value="02">Februari</option>
+                        <option value="03">Maret</option>
+                        <option value="04">April</option>
+                        <option value="05">Mei</option>
+                        <option value="06">Juni</option>
+                        <option value="07">Juli</option>
+                        <option value="08">Agustus</option>
+                        <option value="09">September</option>
+                        <option value="10">Oktober</option>
+                        <option value="11">November</option>
+                        <option value="12">Desember</option>
+                    </select>
+                    <select id="filterYearSingkawang" style="display: none;">
+                        <option value="">-- Tahun --</option>
+                        <option value="2024">2024</option>
+                        <option value="2025">2025</option>
+                    </select>
+                </div>
+                <canvas id="chartSingkawang" height="100"></canvas>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script>
+        const dummyP = [
+            ['Ban Mobil A', 'Mobil', 20, '2025-07-10'],
+            ['Ban Mobil B', 'Mobil', 30, '2025-07-11'],
+            ['Ban Mobil C', 'Mobil', 40, '2025-07-01'],
+            ['Ban Mobil D', 'Mobil', 10, '2025-06-30'],
+            ['Ban Bekas', 'Mobil', 50, '2024-12-15']
+        ];
+        const dummyS = [
+            ['Ban Truk X', 'Truk', 15, '2025-07-09'],
+            ['Ban Truk Y', 'Truk', 25, '2025-07-11'],
+            ['Ban Truk Z', 'Truk', 30, '2025-06-15'],
+            ['Ban Baru', 'Truk', 40, '2024-11-01']
+        ];
+
+        const bahasaIndo = {
+            search: "Cari:",
+            lengthMenu: "Tampilkan _MENU_ entri",
+            info: "Menampilkan _START_–_END_ dari _TOTAL_ entri",
+            paginate: { next: "Berikutnya", previous: "Sebelumnya" },
+            zeroRecords: "Tidak ditemukan data",
+            emptyTable: "Belum ada data"
+        };
+
+        let chartPontianak, chartSingkawang;
+        let dataTableP, dataTableS;
+
+        $(document).ready(function () {
+            dataTableP = $('#tabelPontianak').DataTable({ language: bahasaIndo });
+            dataTableS = $('#tabelSingkawang').DataTable({ language: bahasaIndo });
+            dummyP.forEach(r => dataTableP.row.add(r).draw());
+            dummyS.forEach(r => dataTableS.row.add(r).draw());
+
+            chartPontianak = renderChart('chartPontianak', dummyP, 'daily', {});
+            chartSingkawang = renderChart('chartSingkawang', dummyS, 'daily', {});
+
+            $('#cabangSelect').on('change', function () {
+                $('.laporan-section').hide();
+                const cabang = $(this).val();
+                if (cabang) $('#' + cabang).show();
+                updateCurrentChart();
+            });
+
+            ['Pontianak', 'Singkawang'].forEach(cabang => {
+                $(`#filterType${cabang}`).on('change', function () {
+                    const val = $(this).val();
+                    $(`#filterDate${cabang}, #filterBulan${cabang}, #filterYear${cabang}`).hide();
+                    if (val === 'daily') $(`#filterDate${cabang}`).show();
+                    if (val === 'monthly') {
+                        $(`#filterBulan${cabang}, #filterYear${cabang}`).show();
+                    }
+                    if (val === 'yearly') $(`#filterYear${cabang}`).show();
+                    updateCurrentChart();
+                });
+
+                $(`#filterDate${cabang}, #filterBulan${cabang}, #filterYear${cabang}`).on('change', updateCurrentChart);
+            });
+        });
+
+        function updateCurrentChart() {
+            const cabang = $('#cabangSelect').val();
+            if (!cabang) return;
+            const Cap = cabang.charAt(0).toUpperCase() + cabang.slice(1);
+
+            const type = $(`#filterType${Cap}`).val();
+            const date = $(`#filterDate${Cap}`).val();
+            const bulan = $(`#filterBulan${Cap}`).val();
+            const tahun = $(`#filterYear${Cap}`).val();
+
+            const data = cabang === 'pontianak' ? dummyP : dummyS;
+            const canvasId = cabang === 'pontianak' ? 'chartPontianak' : 'chartSingkawang';
+
+            if (cabang === 'pontianak') chartPontianak?.destroy();
+            if (cabang === 'singkawang') chartSingkawang?.destroy();
+
+            const newChart = renderChart(canvasId, data, type, { date, bulan, tahun });
+
+            if (cabang === 'pontianak') chartPontianak = newChart;
+            if (cabang === 'singkawang') chartSingkawang = newChart;
+        }
+
+        function groupBy(data, mode) {
+            const grouped = {};
+            data.forEach(([_, __, jumlah, tanggal]) => {
+                const date = new Date(tanggal);
+                let key = tanggal;
+                if (mode === 'monthly') key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                if (mode === 'yearly') key = `${date.getFullYear()}`;
+                if (!grouped[key]) grouped[key] = 0;
+                grouped[key] += jumlah;
+            });
+            return grouped;
+        }
+
+        function renderChart(canvasId, data, mode, filters) {
+            const { date, bulan, tahun } = filters;
+            const filterMonthly = tahun && bulan ? `${tahun}-${bulan}` : '';
+            const filterYearly = tahun;
+
+            const filteredData = data.filter(([_, __, ___, tgl]) => {
+                if (mode === 'daily' && date) return tgl === date;
+                if (mode === 'monthly' && filterMonthly) return tgl.startsWith(filterMonthly);
+                if (mode === 'yearly' && filterYearly) return tgl.startsWith(filterYearly);
+                return true;
+            });
+
+            const grouped = groupBy(filteredData, mode);
+            const labels = Object.keys(grouped).sort();
+            const values = labels.map(k => grouped[k]);
+
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            return new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Jumlah Penjualan',
+                        data: values,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
+                    scales: {
+                        x: { title: { display: true, text: mode === 'daily' ? 'Tanggal' : mode === 'monthly' ? 'Bulan' : 'Tahun' } },
+                        y: { beginAtZero: true, title: { display: true, text: 'Jumlah' } }
+                    }
+                }
+            });
+        }
+
+        function exportTableToExcel(tableId, filename = 'data') {
+            const table = document.getElementById(tableId);
+            const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+            XLSX.writeFile(wb, filename + ".xlsx");
+        }
+    </script>
+</body>
+
+</html>

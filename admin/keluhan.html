@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Manajemen Keluhan</title>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f4f6f9;
+        }
+
+        .container {
+            display: flex;
+        }
+
+        .sidebar {
+            width: 220px;
+            background-color: #1e3a8a;
+            color: white;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .sidebar h2 {
+            font-size: 20px;
+            margin-bottom: 30px;
+        }
+
+        .sidebar nav a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+        }
+
+        h1 {
+            color: #1e3a8a;
+            margin-bottom: 20px;
+        }
+
+        .filter-group {
+            margin-bottom: 15px;
+        }
+
+        select {
+            padding: 6px;
+            font-size: 13px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        .dataTables_wrapper {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+            overflow-x: auto;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            font-size: 13px;
+            min-width: 800px;
+        }
+
+        th {
+            white-space: nowrap;
+        }
+
+        td:nth-child(3),
+        td:nth-child(5) {
+            max-width: 180px;
+            white-space: normal;
+            word-break: break-word;
+        }
+
+        .btn {
+            padding: 4px 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn-delete {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .btn-reply {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-backdrop.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #ffffff;
+            padding: 25px 30px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            position: relative;
+        }
+
+        .modal-content h3 {
+            margin: 0 0 15px;
+            font-size: 18px;
+            color: #1e3a8a;
+        }
+
+        .modal-content textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            margin-bottom: 15px;
+            font-family: 'Poppins', sans-serif;
+            box-sizing: border-box;
+        }
+
+        .modal-content button {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter {
+            margin-bottom: 15px;
+        }
+
+        .dataTables_wrapper .dataTables_filter {
+            float: right;
+        }
+
+        table.dataTable thead {
+            background-color: #1e3a8a;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>Admin Panel</h2>
+            <nav>
+                <a href="index.html">🏠 Dashboard</a>
+                <a href="stok.html">📦 Stok</a>
+                <a href="penjualan.html">📈 Penjualan</a>
+                <a href="keluhan.html">💬 Data keluhan</a>
+                <a href="data_karyawan.html">👥 Data Karyawan</a>
+                <a href="laporan_penjualan.html">📊 Laporan</a>
+                <a href="\TestWebsitePPSI\karyawan\login.html">🔒 Logout</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <h1>Daftar Keluhan Karyawan</h1>
+
+            <div class="filter-group">
+                <label>Urutkan: </label>
+                <select id="sortFilter">
+                    <option value="desc">Terbaru</option>
+                    <option value="asc">Terlama</option>
+                </select>
+            </div>
+
+            <div class="table-wrapper">
+                <table id="tabelKeluhan" class="display" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Nama Karyawan</th>
+                            <th>Email Karyawan</th>
+                            <th>Keluhan</th>
+                            <th>Tanggal</th>
+                            <th>Balasan Admin</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <div id="modalBalas" class="modal-backdrop">
+        <div class="modal-content">
+            <h3>Balas Keluhan</h3>
+            <textarea id="inputBalasan" rows="4" placeholder="Tulis balasan..."></textarea>
+            <div style="text-align:right;">
+                <button onclick="closeModal()">Batal</button>
+                <button id="kirimBalasan" style="background:#1e3a8a; color:white;">Kirim</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script>
+        let keluhanTable;
+        let selectedRow = null;
+
+        const keluhanData = [
+            ['Jesika', 'jesika@ptsuryamas.com', 'Tolong perbaiki sistem input stok yang lambat.', '2025-07-08', ''],
+            ['Laurina', 'laurina@ptsuryamas.com', 'Tombol simpan kadang tidak merespons.', '2025-07-09', ''],
+            ['Pransiska', 'pransiska@ptsuryamas.com', 'Tolong tambah pilihan kategori barang.', '2025-07-10', '']
+        ];
+
+        function closeModal() {
+            document.getElementById('modalBalas').classList.remove('show');
+            document.getElementById('inputBalasan').value = '';
+        }
+
+        function sortTable(order = 'desc') {
+            keluhanTable.order([2, order]).draw();
+        }
+
+        const bahasaIndo = {
+            search: "Cari:",
+            lengthMenu: "Tampilkan _MENU_ entri",
+            info: "Menampilkan _START_–_END_ dari _TOTAL_ entri",
+            infoEmpty: "Menampilkan 0 dari 0 entri",
+            infoFiltered: "(disaring dari total _MAX_ entri)",
+            paginate: {
+                next: "Berikutnya",
+                previous: "Sebelumnya"
+            },
+            zeroRecords: "Tidak ditemukan data yang cocok",
+            emptyTable: "Tidak ada data di tabel"
+        };
+
+        $(document).ready(function () {
+            keluhanTable = $('#tabelKeluhan').DataTable({
+                data: keluhanData,
+                columns: [
+                    { title: 'Nama Karyawan' },
+                    { title: 'Email Karyawan' },
+                    { title: 'Keluhan' },
+                    { title: 'Tanggal' },
+                    { title: 'Balasan Admin' },
+                    {
+                        title: 'Aksi',
+                        render: function () {
+                            return `
+                                <button class="btn btn-reply">Balas</button>
+                                <button class="btn btn-delete">Hapus</button>
+                            `;
+                        }
+                    }
+                ],
+                order: [[2, 'desc']],
+                language: bahasaIndo
+            });
+
+            $('#sortFilter').on('change', function () {
+                sortTable(this.value);
+            });
+
+            $('#tabelKeluhan tbody').on('click', '.btn-reply', function () {
+                selectedRow = keluhanTable.row($(this).closest('tr'));
+                document.getElementById('modalBalas').classList.add('show');
+            });
+
+            $('#kirimBalasan').on('click', function () {
+                const text = document.getElementById('inputBalasan').value;
+                if (selectedRow && text.trim() !== '') {
+                    const data = selectedRow.data();
+                    data[4] = text;
+                    selectedRow.data(data).draw();
+                    closeModal();
+                }
+            });
+
+            $('#tabelKeluhan tbody').on('click', '.btn-delete', function () {
+                keluhanTable.row($(this).closest('tr')).remove().draw();
+            });
+        });
+    </script>
+</body>
+
+</html>

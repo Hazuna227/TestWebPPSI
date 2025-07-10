@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Data Karyawan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f4f6f9;
+        }
+
+        .container {
+            display: flex;
+        }
+
+        .sidebar {
+            width: 220px;
+            background-color: #1e3a8a;
+            color: white;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .sidebar h2 {
+            font-size: 20px;
+            margin-bottom: 30px;
+        }
+
+        .sidebar nav a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+        }
+
+        h1 {
+            color: #1e3a8a;
+            margin-bottom: 20px;
+        }
+
+        .top-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+
+        select {
+            padding: 10px;
+            width: 220px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        .btn {
+            background-color: #3b82f6;
+            color: white;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            background-color: #2563eb;
+        }
+
+        table.dataTable thead {
+            background-color: #1e3a8a;
+            color: white;
+        }
+
+        .dataTables_wrapper {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .aksi-wrapper {
+            display: flex;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .btn-edit,
+        .btn-hapus {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .btn-edit {
+            background-color: #f59e0b;
+        }
+
+        .btn-hapus {
+            background-color: #ef4444;
+        }
+
+        /* Popup Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 25px 30px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-content h3 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #1e3a8a;
+        }
+
+        .modal-content input,
+        .modal-content select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .modal-footer button {
+            padding: 10px 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .modal-footer .btn-batal {
+            background: #e5e7eb;
+            color: #1e3a8a;
+        }
+
+        .modal-footer .btn-simpan {
+            background: #1e3a8a;
+            color: white;
+        }
+
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter {
+            margin-bottom: 15px;
+        }
+
+        table.dataTable {
+            font-size: 13px;
+            /* Ukuran font isi tabel */
+        }
+
+        table.dataTable th {
+            font-size: 13px;
+            /* Ukuran font header */
+            white-space: nowrap;
+        }
+
+        table.dataTable td {
+            font-size: 13px;
+            /* Ukuran font data */
+            white-space: nowrap;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>Admin Panel</h2>
+            <nav>
+                <a href="index.html">🏠 Dashboard</a>
+                <a href="stok.html">📦 Stok</a>
+                <a href="penjualan.html">📈 Penjualan</a>
+                <a href="keluhan.html">💬 Data keluhan</a>
+                <a href="data_karyawan.html">👥 Data Karyawan</a>
+                <a href="laporan_penjualan.html">📊 Laporan</a>
+                <a href="\TestWebsitePPSI\karyawan\login.html">🔒 Logout</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <h1>Data Karyawan</h1>
+            <div class="top-controls">
+                <select id="filterCabang">
+                    <option value="">-- Semua Cabang --</option>
+                    <option value="Pontianak">Pontianak</option>
+                    <option value="Singkawang">Singkawang</option>
+                </select>
+                <button class="btn" onclick="openForm()">+ Tambah Karyawan</button>
+                <button class="btn" onclick="unduhExcel()">⬇️ Unduh Excel</button>
+            </div>
+
+            <table id="tabelKaryawan" class="display" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Nama</th>
+                        <th>Email</th>
+                        <th>Jabatan</th>
+                        <th>Cabang</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </main>
+    </div>
+
+    <!-- Modal Form -->
+    <div class="modal" id="formModal">
+        <div class="modal-content">
+            <h3 id="modalTitle">Tambah Karyawan</h3>
+            <input type="hidden" id="rowIndex">
+            <input type="text" id="nama" placeholder="Nama">
+            <input type="email" id="email" placeholder="Email">
+            <input type="text" id="jabatan" placeholder="Jabatan">
+            <select id="cabang">
+                <option value="">-- Pilih Cabang --</option>
+                <option value="Pontianak">Pontianak</option>
+                <option value="Singkawang">Singkawang</option>
+            </select>
+            <div class="modal-footer">
+                <button class="btn-batal" onclick="closeForm()">Batal</button>
+                <button class="btn-simpan" onclick="simpanData()">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script>
+        let tabel;
+        const dummyData = [
+            ['Andi Wijaya', 'andi@ptsuryamas.com', 'Staff Gudang', 'Pontianak'],
+            ['Rina Putri', 'rina@ptsuryamas.com', 'Kasir', 'Singkawang'],
+        ];
+
+        $(document).ready(function () {
+            tabel = $('#tabelKaryawan').DataTable({
+                language: {
+                    search: "Cari:",
+                    lengthMenu: "Tampilkan _MENU_ data",
+                    info: "Menampilkan _START_–_END_ dari _TOTAL_ data",
+                    paginate: { next: "Berikutnya", previous: "Sebelumnya" },
+                    zeroRecords: "Tidak ditemukan data",
+                    emptyTable: "Belum ada data"
+                }
+            });
+
+            dummyData.forEach(row => tabel.row.add([...row, renderAksi()]).draw());
+
+            $('#filterCabang').on('change', function () {
+                tabel.column(3).search(this.value).draw();
+            });
+        });
+
+        function renderAksi() {
+            return `<div class="aksi-wrapper">
+        <button class="btn-edit" onclick="editRow(this)">Edit</button>
+        <button class="btn-hapus" onclick="hapusRow(this)">Hapus</button>
+      </div>`;
+        }
+
+        function openForm() {
+            $('#formModal').addClass('show');
+            $('#modalTitle').text('Tambah Karyawan');
+            $('#rowIndex').val('');
+            $('#formModal input, #formModal select').val('');
+        }
+
+        function closeForm() {
+            $('#formModal').removeClass('show');
+        }
+
+        function simpanData() {
+            const nama = $('#nama').val().trim();
+            const email = $('#email').val().trim();
+            const jabatan = $('#jabatan').val().trim();
+            const cabang = $('#cabang').val().trim();
+            const idx = $('#rowIndex').val();
+
+            if (!nama || !email || !jabatan || !cabang) {
+                alert("Semua field harus diisi.");
+                return;
+            }
+
+            const rowData = [nama, email, jabatan, cabang, renderAksi()];
+            if (idx === '') {
+                tabel.row.add(rowData).draw();
+            } else {
+                tabel.row(idx).data(rowData).draw();
+            }
+            closeForm();
+        }
+
+        function editRow(btn) {
+            const row = $(btn).closest('tr');
+            const index = tabel.row(row).index();
+            const data = tabel.row(index).data();
+
+            $('#rowIndex').val(index);
+            $('#nama').val(data[0]);
+            $('#email').val(data[1]);
+            $('#jabatan').val(data[2]);
+            $('#cabang').val(data[3]);
+            $('#modalTitle').text('Edit Karyawan');
+            $('#formModal').addClass('show');
+        }
+
+        function hapusRow(btn) {
+            if (confirm("Yakin ingin menghapus data ini?")) {
+                const row = $(btn).closest('tr');
+                tabel.row(row).remove().draw();
+            }
+        }
+
+        function unduhExcel() {
+            const wb = XLSX.utils.book_new();
+            const data = [['Nama', 'Email', 'Jabatan', 'Cabang']];
+
+            tabel.rows({ search: 'applied' }).every(function () {
+                const d = this.data();
+                data.push([d[0], d[1], d[2], d[3]]);
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            XLSX.utils.book_append_sheet(wb, ws, "DataKaryawan");
+            XLSX.writeFile(wb, "Data_Karyawan.xlsx");
+        }
+    </script>
+</body>
+
+</html>

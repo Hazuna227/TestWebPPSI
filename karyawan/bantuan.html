@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Halaman Bantuan</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      height: 100vh;
+      background: linear-gradient(120deg, #3b82f6, white);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .bantuan-container {
+      background-color: #ffffffef;
+      padding: 30px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 420px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      position: relative;
+    }
+
+    .bantuan-container h2 {
+      margin-top: 0;
+      color: #1f2937;
+      font-weight: 600;
+    }
+
+    .bantuan-container p {
+      color: #374151;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+    }
+
+    textarea {
+      height: 90px;
+      resize: none;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      background-color: #3b82f6;
+      color: white;
+      padding: 10px;
+      margin-top: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 15px;
+      transition: background-color 0.3s ease;
+    }
+
+    button[type="submit"]:hover {
+      background-color: #2563eb;
+    }
+
+    .kontak {
+      margin-top: 20px;
+      border-top: 1px solid #e5e7eb;
+      padding-top: 10px;
+      font-size: 14px;
+    }
+
+    .kontak a {
+      color: #2563eb;
+      text-decoration: none;
+      display: block;
+      margin-top: 4px;
+    }
+
+    .kontak a:hover {
+      text-decoration: underline;
+    }
+
+    .back-button {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background-color: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s ease;
+    }
+
+    .back-button:hover {
+      background-color: #2563eb;
+    }
+
+    /* Tombol balasan admin di kanan bawah */
+    .balasan-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #2563eb;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 30px;
+      border: none;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .balasan-button .dot {
+      width: 10px;
+      height: 10px;
+      background-color: red;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .balasan-button:hover {
+      background-color: #3749a3;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="bantuan-container">
+    <button class="back-button" onclick="goBack()">← Kembali</button>
+
+    <h2>Butuh Bantuan?</h2>
+    <p>Silakan isi form di bawah untuk menyampaikan keluhan atau pertanyaan.</p>
+
+    <input type="text" placeholder="Nama Anda" required>
+    <input type="email" placeholder="Email Anda" required>
+    <textarea placeholder="Tulis keluhan Anda..." required></textarea>
+    <button type="submit">Kirim</button>
+
+    <div class="kontak">
+      <strong>Email Admin:</strong>
+      <a href="mailto:admin@ptsuryamas.com">admin@ptsuryamas.com</a>
+
+      <strong>WhatsApp Admin:</strong>
+      <a href="https://wa.me/6281234567890" target="_blank">+62 812-3456-7890</a>
+    </div>
+  </div>
+
+  <!-- Tombol ke halaman balasan admin -->
+  <button class="balasan-button" onclick="window.location.href='balasan_keluhan.html'">
+    🔔 Balasan Admin
+  </button>
+
+  <script>
+    function goBack() {
+      window.history.back();
+    }
+  </script>
+
+</body>
+
+</html>

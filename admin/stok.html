@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Manajemen Stok Cabang</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f4f6f9;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 220px;
+            background-color: #1e3a8a;
+            color: white;
+            padding: 20px;
+        }
+
+        .sidebar h2 {
+            font-size: 20px;
+            margin-bottom: 30px;
+        }
+
+        .sidebar nav a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+        }
+
+        h1 {
+            color: #1e3a8a;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        select {
+            padding: 10px;
+            font-size: 14px;
+            width: 260px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            margin-top: 5px;
+        }
+
+        .stok-section {
+            display: none;
+            margin-top: 25px;
+        }
+
+        .stok-section.active {
+            display: block;
+        }
+
+        .tombol-tambah {
+            background: #10b981;
+            color: white;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-bottom: 18px;
+        }
+
+        .dataTables_wrapper {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        table.dataTable thead {
+            background-color: #1e3a8a;
+            color: white;
+        }
+
+        .btn-edit,
+        .btn-hapus {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .btn-edit {
+            background-color: #f59e0b;
+        }
+
+        .btn-hapus {
+            background-color: #ef4444;
+        }
+
+        td .aksi-wrapper {
+            display: flex;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        /* Modal */
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .modal-backdrop.show {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 25px 30px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            font-family: 'Poppins', sans-serif;
+            position: relative;
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-weight: 600;
+            color: #1e3a8a;
+            font-size: 20px;
+            text-align: center;
+        }
+
+        .modal-content label {
+            font-weight: 500;
+            font-size: 14px;
+            margin-top: 10px;
+            display: block;
+        }
+
+        .modal-content input,
+        .modal-content select {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0 16px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .modal-content button {
+            padding: 10px 16px;
+            font-size: 14px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .modal-content .modal-close {
+            float: right;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            color: #ef4444;
+        }
+
+        .modal-content .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .modal-content button[type="submit"] {
+            background-color: #1e3a8a;
+            color: white;
+        }
+
+        .modal-content button[type="button"] {
+            background-color: #e5e7eb;
+            color: #1e3a8a;
+        }
+
+        @media (max-width: 600px) {
+            .modal-content {
+                margin: 20px;
+                width: calc(100% - 40px);
+            }
+        }
+
+        /* Tambahkan ini di bagian akhir <style> kamu */
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter {
+            margin-bottom: 15px;
+        }
+
+        .dataTables_wrapper .dataTables_filter {
+            float: right;
+        }
+
+        .tombol-unduh {
+            background: linear-gradient(90deg, #2563eb, #3b82f6);
+            color: white;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            transition: background 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            height: 40px;
+            /* Sama tinggi dengan .tombol-tambah */
+        }
+
+        .tombol-unduh:hover {
+            background: linear-gradient(90deg, #1e40af, #2563eb);
+        }
+
+        table.dataTable {
+            font-size: 13px;
+            /* Ukuran font isi tabel */
+        }
+
+        table.dataTable th {
+            font-size: 13px;
+            /* Ukuran font header */
+            white-space: nowrap;
+        }
+
+        table.dataTable td {
+            font-size: 13px;
+            /* Ukuran font data */
+            white-space: nowrap;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>Admin Panel</h2>
+            <nav>
+                <a href="index.html">🏠 Dashboard</a>
+                <a href="stok.html">📦 Stok</a>
+                <a href="penjualan.html">📈 Penjualan</a>
+                <a href="keluhan.html">💬 Data keluhan</a>
+                <a href="data_karyawan.html">👥 Data Karyawan</a>
+                <a href="laporan_penjualan.html">📊 Laporan</a>
+                <a href="\TestWebsitePPSI\karyawan\login.html">🔒 Logout</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <h1>Manajemen Stok Barang</h1>
+            <div class="form-group">
+                <label for="cabangSelect">Pilih Cabang:</label><br />
+                <select id="cabangSelect" onchange="showCabang()">
+                    <option value="">-- Pilih Cabang --</option>
+                    <option value="pontianak">Cabang Pontianak</option>
+                    <option value="singkawang">Cabang Singkawang</option>
+                </select>
+            </div>
+
+            <div id="pontianak" class="stok-section">
+                <div style="display: flex; gap: 10px; margin-bottom: 18px;">
+                    <button class="tombol-tambah" onclick="openForm('pontianak')">+ Tambah Stok</button>
+                    <button class="tombol-unduh" onclick="exportTableToExcel('tabelPontianak', 'Stok_Pontianak')">
+                        ⬇️ Unduh Excel
+                    </button>
+                </div>
+                <table id="tabelPontianak" class="display" style="width: 100%">
+                    <thead>
+                        <tr>
+                            <th>Nama Barang</th>
+                            <th>Kategori</th>
+                            <th>Masuk</th>
+                            <th>Keluar</th>
+                            <th>Tersisa</th>
+                            <th>Tanggal Masuk</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div id="singkawang" class="stok-section">
+                <div style="display: flex; gap: 10px; margin-bottom: 18px;">
+                    <button class="tombol-tambah" onclick="openForm('singkawang')">+ Tambah Stok</button>
+                    <button class="tombol-unduh" onclick="exportTableToExcel('tabelSingkawang', 'Stok_Singkawang')">
+                        ⬇️ Unduh Excel
+                    </button>
+                </div>
+                <table id="tabelSingkawang" class="display" style="width: 100%">
+                    <thead>
+                        <tr>
+                            <th>Nama Barang</th>
+                            <th>Kategori</th>
+                            <th>Masuk</th>
+                            <th>Keluar</th>
+                            <th>Tersisa</th>
+                            <th>Tanggal Masuk</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Form -->
+    <div id="modalForm" class="modal-backdrop">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <h3 id="modalTitle">Tambah Stok</h3>
+            <form id="formStok">
+                <input type="hidden" id="rowIndex" />
+                <label>Nama Barang:</label>
+                <input type="text" id="in_nama" required />
+                <label>Kategori:</label>
+                <input type="text" id="in_kategori" required />
+                <label>Masuk:</label>
+                <input type="number" id="in_masuk" required />
+                <label>Keluar:</label>
+                <input type="number" id="in_keluar" required />
+                <label>Tanggal:</label>
+                <input type="date" id="in_tanggal" required />
+                <div style="text-align: right;">
+                    <button type="button" onclick="closeModal()">Batal</button>
+                    <button type="submit">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Delete -->
+    <div id="modalDelete" class="modal-backdrop">
+        <div class="modal-content" style="text-align: center;">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <p>Yakin ingin menghapus item ini?</p>
+            <div style="margin-top: 15px;">
+                <button onclick="closeModal()">Batal</button>
+                <button id="btnConfirmDelete" style="background: red; color: white;">Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script>
+        let tP, tS; // Variabel global agar bisa diakses dari openForm()
+
+        function showCabang() {
+            document.querySelectorAll('.stok-section').forEach(s => s.classList.remove('active'));
+            const v = document.getElementById('cabangSelect').value;
+            if (v) document.getElementById(v).classList.add('active');
+        }
+
+        function renderActions() {
+            return `<div class="aksi-wrapper">
+            <button class="btn-edit">Edit</button>
+            <button class="btn-hapus">Hapus</button>
+          </div>`;
+        }
+
+        function closeModal() {
+            document.getElementById('modalForm').classList.remove('show');
+            document.getElementById('modalDelete').classList.remove('show');
+        }
+
+        $(document).ready(function () {
+            const dataP = [
+                ['Ban Mobil A', 'Mobil', 100, 30, 70, '2025-07-10'],
+                ['Ban Motor B', 'Motor', 80, 20, 60, '2025-07-11']
+            ];
+            const dataS = [
+                ['Ban Truk X', 'Truk', 70, 20, 50, '2025-07-08'],
+                ['Ban Mobil Y', 'Mobil', 90, 30, 60, '2025-07-09']
+            ];
+
+            const bahasaID = {
+                search: "Pencarian:",
+                lengthMenu: "Tampilkan _MENU_ entri per halaman",
+                info: "Menampilkan _START_–_END_ dari _TOTAL_ entri",
+                infoEmpty: "Menampilkan 0 dari 0 entri",
+                infoFiltered: "(disaring dari _MAX_ total entri)",
+                zeroRecords: "Tidak ada data yang cocok ditemukan",
+                paginate: {
+                    next: "Berikutnya",
+                    previous: "Sebelumnya"
+                }
+            };
+
+            tP = $('#tabelPontianak').DataTable({ language: bahasaID });
+            tS = $('#tabelSingkawang').DataTable({ language: bahasaID });
+
+            dataP.forEach(r => tP.row.add([...r, renderActions()]).draw());
+            dataS.forEach(r => tS.row.add([...r, renderActions()]).draw());
+
+            attach(tP);
+            attach(tS);
+        });
+
+        function attach(table) {
+            const tableId = table.table().node().id;
+
+            $('#' + tableId + ' tbody').on('click', '.btn-edit', function () {
+                const row = table.row($(this).closest('tr'));
+                const d = row.data();
+                $('#modalTitle').text('Edit Stok');
+                $('#rowIndex').val(row.index());
+                $('#in_nama').val(d[0]);
+                $('#in_kategori').val(d[1]);
+                $('#in_masuk').val(d[2]);
+                $('#in_keluar').val(d[3]);
+                $('#in_tanggal').val(d[5]);
+                document.getElementById('modalForm').classList.add('show');
+            });
+
+            $('#' + tableId + ' tbody').on('click', '.btn-hapus', function () {
+                const row = table.row($(this).closest('tr'));
+                $('#btnConfirmDelete').off().on('click', () => {
+                    row.remove().draw();
+                    closeModal();
+                });
+                document.getElementById('modalDelete').classList.add('show');
+            });
+        }
+
+        // DIPINDAHKAN KE LUAR agar bisa dipanggil dari HTML onclick
+        function openForm(cabang) {
+            const t = cabang === 'pontianak' ? tP : tS;
+            $('#modalTitle').text('Tambah Stok');
+            $('#rowIndex').val('');
+            $('#formStok')[0].reset();
+            document.getElementById('modalForm').classList.add('show');
+
+            $('#formStok').off().on('submit', function (e) {
+                e.preventDefault();
+                const n = $('#in_nama').val(), k = $('#in_kategori').val();
+                const m = +$('#in_masuk').val(), x = +$('#in_keluar').val();
+                const tgl = $('#in_tanggal').val(), s = m - x;
+
+                if ($('#rowIndex').val() === '') {
+                    t.row.add([n, k, m, x, s, tgl, renderActions()]).draw();
+                } else {
+                    const idx = +$('#rowIndex').val();
+                    t.row(idx).data([n, k, m, x, s, tgl, renderActions()]).draw();
+                }
+                attach(t);
+                closeModal();
+            });
+        }
+
+        function exportTableToExcel(tableId, filename = 'data') {
+            const table = document.getElementById(tableId);
+            const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+            XLSX.writeFile(wb, filename + ".xlsx");
+        }
+    </script>
+
+</body>
+
+</html>

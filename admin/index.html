@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Dashboard Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f4f6f9;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        aside.sidebar {
+            width: 220px;
+            background-color: #1e3a8a;
+            color: white;
+            padding: 20px;
+        }
+
+        aside.sidebar h2 {
+            font-size: 20px;
+            margin-bottom: 30px;
+        }
+
+        aside.sidebar nav a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        main.main-content {
+            flex: 1;
+            padding: 30px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .summary-cards {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-box {
+            flex: 1;
+            background-color: #3b82f6;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .summary-box.keluar {
+            background-color: #ef4444;
+        }
+
+        .chart-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .chart-box {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .chart-box h3 {
+            margin-top: 0;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .btn-unduh {
+            padding: 8px 12px;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        canvas {
+            max-width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>Admin Panel</h2>
+            <nav>
+                <a href="C:\xampp\htdocs\TestWebsitePPSI\admin\index.html">🏠 Dashboard</a>
+                <a href="stok.html">📦 Stok</a>
+                <a href="penjualan.html">📈 Penjualan</a>
+                <a href="keluhan.html">💬 Data keluhan</a>
+                <a href="data_karyawan.html">👥 Data Karyawan</a>
+                <a href="laporan_penjualan.html">📊 Laporan</a>
+                <a href="\TestWebsitePPSI\karyawan\login.html">🔒 Logout</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="header">
+                <h1>Dashboard Admin</h1>
+            </div>
+
+            <div class="summary-cards">
+                <div class="summary-box">
+                    <h2>Stok Masuk</h2>
+                    <p>120 Barang</p>
+                </div>
+                <div class="summary-box keluar">
+                    <h2>Stok Keluar</h2>
+                    <p>85 Barang</p>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-box">
+                    <h3>Stok Masuk vs Keluar</h3>
+                    <div class="filter-group">
+                        <select id="filterStok">
+                            <option value="harian">Per Hari</option>
+                            <option value="bulanan">Per Bulan</option>
+                            <option value="tahunan">Per Tahun</option>
+                        </select>
+                        <input type="date" id="stokHarian" style="display:none;">
+                        <select id="stokBulanan" style="display:none;">
+                            <option value="2025-07">Juli 2025</option>
+                            <option value="2025-06">Juni 2025</option>
+                        </select>
+                        <select id="stokTahunan" style="display:none;">
+                            <option value="2025">2025</option>
+                            <option value="2024">2024</option>
+                        </select>
+                        <button class="btn-unduh" onclick="downloadChart('stokChart')">📥 Unduh</button>
+                    </div>
+                    <canvas id="stokChart"></canvas>
+                </div>
+
+                <div class="chart-box">
+                    <h3>Grafik Penjualan</h3>
+                    <div class="filter-group">
+                        <select id="filterPenjualan">
+                            <option value="harian">Per Hari</option>
+                            <option value="bulanan">Per Bulan</option>
+                            <option value="tahunan">Per Tahun</option>
+                        </select>
+                        <input type="date" id="penjualanHarian" style="display:none;">
+                        <select id="penjualanBulanan" style="display:none;">
+                            <option value="2025-07">Juli 2025</option>
+                            <option value="2025-06">Juni 2025</option>
+                        </select>
+                        <select id="penjualanTahunan" style="display:none;">
+                            <option value="2025">2025</option>
+                            <option value="2024">2024</option>
+                        </select>
+                        <button class="btn-unduh" onclick="downloadChart('penjualanChart')">📥 Unduh</button>
+                    </div>
+                    <canvas id="penjualanChart"></canvas>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let stokChart = new Chart(document.getElementById('stokChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Stok Masuk', 'Stok Keluar'],
+                datasets: [{
+                    label: 'Jumlah Barang',
+                    data: [120, 85],
+                    backgroundColor: ['#3b82f6', '#ef4444']
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
+        let penjualanChart = new Chart(document.getElementById('penjualanChart'), {
+            type: 'line',
+            data: {
+                labels: ['01 Jul', '02 Jul', '03 Jul', '04 Jul', '05 Jul'],
+                datasets: [{
+                    label: 'Penjualan',
+                    data: [20, 35, 30, 40, 25],
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
+        function downloadChart(chartId) {
+            const link = document.createElement('a');
+            link.download = `${chartId}.png`;
+            link.href = document.getElementById(chartId).toDataURL();
+            link.click();
+        }
+
+        function toggleInput(filterId, harianId, bulananId, tahunanId) {
+            const tipe = document.getElementById(filterId).value;
+            document.getElementById(harianId).style.display = 'none';
+            document.getElementById(bulananId).style.display = 'none';
+            document.getElementById(tahunanId).style.display = 'none';
+
+            if (tipe === 'harian') document.getElementById(harianId).style.display = 'inline-block';
+            else if (tipe === 'bulanan') document.getElementById(bulananId).style.display = 'inline-block';
+            else if (tipe === 'tahunan') document.getElementById(tahunanId).style.display = 'inline-block';
+        }
+
+        // ===== Update Stok Chart =====
+        function updateStokChart() {
+            const filter = document.getElementById('filterStok').value;
+
+            let newData = [];
+            if (filter === 'harian') {
+                const date = document.getElementById('stokHarian').value;
+                newData = date ? [15, 10] : [120, 85];
+            } else if (filter === 'bulanan') {
+                const month = document.getElementById('stokBulanan').value;
+                newData = month === '2025-07' ? [70, 40] : [50, 45];
+            } else if (filter === 'tahunan') {
+                const year = document.getElementById('stokTahunan').value;
+                newData = year === '2025' ? [200, 150] : [180, 160];
+            }
+
+            stokChart.data.datasets[0].data = newData;
+            stokChart.update();
+        }
+
+        // ===== Update Penjualan Chart =====
+        function updatePenjualanChart() {
+            const filter = document.getElementById('filterPenjualan').value;
+            let newLabels = [], newData = [];
+
+            if (filter === 'harian') {
+                const date = document.getElementById('penjualanHarian').value;
+                newLabels = [date || 'Hari Ini'];
+                newData = [30];
+            } else if (filter === 'bulanan') {
+                const month = document.getElementById('penjualanBulanan').value;
+                newLabels = ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4'];
+                newData = month === '2025-07' ? [100, 120, 90, 110] : [80, 75, 95, 100];
+            } else if (filter === 'tahunan') {
+                const year = document.getElementById('penjualanTahunan').value;
+                newLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul'];
+                newData = year === '2025' ? [100, 110, 90, 130, 150, 160, 170] : [80, 95, 70, 100, 120, 130, 140];
+            }
+
+            penjualanChart.data.labels = newLabels;
+            penjualanChart.data.datasets[0].data = newData;
+            penjualanChart.update();
+        }
+
+        // ==== Listener untuk Filter Stok ====
+        document.getElementById('filterStok').addEventListener('change', () => {
+            toggleInput('filterStok', 'stokHarian', 'stokBulanan', 'stokTahunan');
+            updateStokChart();
+        });
+
+        document.getElementById('stokHarian').addEventListener('change', updateStokChart);
+        document.getElementById('stokBulanan').addEventListener('change', updateStokChart);
+        document.getElementById('stokTahunan').addEventListener('change', updateStokChart);
+
+        // ==== Listener untuk Filter Penjualan ====
+        document.getElementById('filterPenjualan').addEventListener('change', () => {
+            toggleInput('filterPenjualan', 'penjualanHarian', 'penjualanBulanan', 'penjualanTahunan');
+            updatePenjualanChart();
+        });
+
+        document.getElementById('penjualanHarian').addEventListener('change', updatePenjualanChart);
+        document.getElementById('penjualanBulanan').addEventListener('change', updatePenjualanChart);
+        document.getElementById('penjualanTahunan').addEventListener('change', updatePenjualanChart);
+
+        // Trigger awal
+        toggleInput('filterStok', 'stokHarian', 'stokBulanan', 'stokTahunan');
+        toggleInput('filterPenjualan', 'penjualanHarian', 'penjualanBulanan', 'penjualanTahunan');
+    </script>
+
+</body>
+
+</html>

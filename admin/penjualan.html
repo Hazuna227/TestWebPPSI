@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Manajemen Penjualan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f4f6f9;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 220px;
+            background-color: #1e3a8a;
+            color: white;
+            padding: 20px;
+        }
+
+        .sidebar h2 {
+            font-size: 20px;
+            margin-bottom: 30px;
+        }
+
+        .sidebar nav a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+        }
+
+        h1 {
+            color: #1e3a8a;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        select {
+            padding: 10px;
+            width: 260px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        .penjualan-section {
+            display: none;
+        }
+
+        .penjualan-section.active {
+            display: block;
+        }
+
+        .tombol-tambah {
+            background: #10b981;
+            color: white;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            height: 40px;
+        }
+
+        .tombol-unduh {
+            background: linear-gradient(90deg, #2563eb, #3b82f6);
+            color: white;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tombol-unduh:hover {
+            background: linear-gradient(90deg, #1e40af, #2563eb);
+        }
+
+        .dataTables_wrapper {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        table.dataTable thead {
+            background-color: #1e3a8a;
+            color: white;
+        }
+
+        .btn-edit,
+        .btn-hapus {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .btn-edit {
+            background-color: #f59e0b;
+        }
+
+        .btn-hapus {
+            background-color: #ef4444;
+        }
+
+        .aksi-wrapper {
+            display: flex;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-backdrop.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 25px 30px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-content h3 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #1e3a8a;
+        }
+
+        .modal-content label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0 16px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        .modal-content button {
+            padding: 10px 16px;
+            font-size: 14px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .modal-close {
+            float: right;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            color: #ef4444;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .modal-content button[type="submit"] {
+            background-color: #1e3a8a;
+            color: white;
+        }
+
+        .modal-content button[type="button"] {
+            background-color: #e5e7eb;
+            color: #1e3a8a;
+        }
+
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter {
+            margin-bottom: 15px;
+        }
+
+        .dataTables_wrapper .dataTables_filter {
+            float: right;
+        }
+
+        table.dataTable {
+            font-size: 13px;
+            /* Ukuran font isi tabel */
+        }
+
+        table.dataTable th {
+            font-size: 13px;
+            /* Ukuran font header */
+            white-space: nowrap;
+        }
+
+        table.dataTable td {
+            font-size: 13px;
+            /* Ukuran font data */
+            white-space: nowrap;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>Admin Panel</h2>
+            <nav>
+                <a href="index.html">🏠 Dashboard</a>
+                <a href="stok.html">📦 Stok</a>
+                <a href="penjualan.html">📈 Penjualan</a>
+                <a href="keluhan.html">💬 Data keluhan</a>
+                <a href="data_karyawan.html">👥 Data Karyawan</a>
+                <a href="laporan_penjualan.html">📊 Laporan</a>
+                <a href="\TestWebsitePPSI\karyawan\login.html">🔒 Logout</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <h1>Manajemen Penjualan</h1>
+            <div class="form-group">
+                <label for="cabangSelect">Pilih Cabang:</label><br />
+                <select id="cabangSelect" onchange="showCabang()">
+                    <option value="">-- Pilih Cabang --</option>
+                    <option value="pontianak">Cabang Pontianak</option>
+                    <option value="singkawang">Cabang Singkawang</option>
+                </select>
+            </div>
+
+            <div id="pontianak" class="penjualan-section">
+                <div style="display: flex; gap: 10px; margin-bottom: 18px;">
+                    <button class="tombol-tambah">+ Tambah Penjualan</button>
+                    <button class="tombol-unduh" onclick="exportTableToExcel('tabelPontianak', 'Penjualan_Pontianak')">
+                        ⬇️ Unduh Excel
+                    </button>
+                </div>
+                <table id="tabelPontianak" class="display" style="width: 100%">
+                    <thead>
+                        <tr>
+                            <th>Nama Barang</th>
+                            <th>Kategori</th>
+                            <th>Jumlah</th>
+                            <th>Tanggal</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div id="singkawang" class="penjualan-section">
+                <div style="display: flex; gap: 10px; margin-bottom: 18px;">
+                    <button class="tombol-tambah">+ Tambah Penjualan</button>
+                    <button class="tombol-unduh"
+                        onclick="exportTableToExcel('tabelSingkawang', 'Penjualan_Singkawang')">
+                        ⬇️ Unduh Excel
+                    </button>
+                </div>
+                <table id="tabelSingkawang" class="display" style="width: 100%">
+                    <thead>
+                        <tr>
+                            <th>Nama Barang</th>
+                            <th>Kategori</th>
+                            <th>Jumlah</th>
+                            <th>Tanggal</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Tambah/Edit -->
+    <div id="modalForm" class="modal-backdrop">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <h3 id="modalTitle">Tambah Penjualan</h3>
+            <form id="formPenjualan">
+                <input type="hidden" id="rowIndex" />
+                <label>Nama Barang:</label>
+                <input type="text" id="in_nama" required />
+                <label>Kategori:</label>
+                <input type="text" id="in_kategori" required />
+                <label>Jumlah:</label>
+                <input type="number" id="in_jumlah" required />
+                <label>Tanggal:</label>
+                <input type="date" id="in_tanggal" required />
+                <div class="modal-footer">
+                    <button type="button" onclick="closeModal()">Batal</button>
+                    <button type="submit">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Hapus -->
+    <div id="modalDelete" class="modal-backdrop">
+        <div class="modal-content" style="text-align: center;">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <p>Yakin ingin menghapus data ini?</p>
+            <div style="margin-top: 15px;">
+                <button onclick="closeModal()">Batal</button>
+                <button id="btnConfirmDelete" style="background: red; color: white;">Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script>
+        function showCabang() {
+            document.querySelectorAll('.penjualan-section').forEach(s => s.classList.remove('active'));
+            const val = document.getElementById('cabangSelect').value;
+            if (val) document.getElementById(val).classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modalForm').classList.remove('show');
+            document.getElementById('modalDelete').classList.remove('show');
+        }
+
+        function renderActions() {
+            return `<div class="aksi-wrapper">
+                <button class="btn-edit">Edit</button>
+                <button class="btn-hapus">Hapus</button>
+            </div>`;
+        }
+
+        function exportTableToExcel(tableId, filename = 'data') {
+            const table = document.getElementById(tableId);
+            const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+            XLSX.writeFile(wb, filename + ".xlsx");
+        }
+
+        $(document).ready(function () {
+            const tP = $('#tabelPontianak').DataTable();
+            const tS = $('#tabelSingkawang').DataTable();
+
+            const dummyP = [
+                ['Ban Mobil A', 'Mobil', 20, '2025-07-10'],
+                ['Ban Motor C', 'Motor', 15, '2025-07-11']
+            ];
+
+            const dummyS = [
+                ['Ban Truk X', 'Truk', 15, '2025-07-09'],
+                ['Ban Motor M', 'Motor', 18, '2025-07-10']
+            ];
+
+            dummyP.forEach(r => tP.row.add([...r, renderActions()]).draw());
+            dummyS.forEach(r => tS.row.add([...r, renderActions()]).draw());
+
+            function attach(table, id) {
+                $('#' + id + ' tbody').on('click', '.btn-edit', function () {
+                    const row = table.row($(this).closest('tr'));
+                    const d = row.data();
+                    $('#modalTitle').text('Edit Penjualan');
+                    $('#rowIndex').val(row.index());
+                    $('#in_nama').val(d[0]);
+                    $('#in_kategori').val(d[1]);
+                    $('#in_jumlah').val(d[2]);
+                    $('#in_tanggal').val(d[3]);
+                    document.getElementById('modalForm').classList.add('show');
+                });
+
+                $('#' + id + ' tbody').on('click', '.btn-hapus', function () {
+                    const row = table.row($(this).closest('tr'));
+                    $('#btnConfirmDelete').off().on('click', () => {
+                        row.remove().draw();
+                        closeModal();
+                    });
+                    document.getElementById('modalDelete').classList.add('show');
+                });
+            }
+
+            attach(tP, 'tabelPontianak');
+            attach(tS, 'tabelSingkawang');
+
+            document.querySelectorAll('.tombol-tambah').forEach((btn, i) => {
+                btn.onclick = () => {
+                    const table = i === 0 ? tP : tS;
+                    $('#modalTitle').text('Tambah Penjualan');
+                    $('#formPenjualan')[0].reset();
+                    $('#rowIndex').val('');
+                    document.getElementById('modalForm').classList.add('show');
+
+                    $('#formPenjualan').off().on('submit', function (e) {
+                        e.preventDefault();
+                        const n = $('#in_nama').val(),
+                            k = $('#in_kategori').val(),
+                            j = +$('#in_jumlah').val(),
+                            tgl = $('#in_tanggal').val();
+                        const rowIdx = $('#rowIndex').val();
+
+                        if (rowIdx === '') {
+                            table.row.add([n, k, j, tgl, renderActions()]).draw();
+                        } else {
+                            table.row(+rowIdx).data([n, k, j, tgl, renderActions()]).draw();
+                        }
+
+                        closeModal();
+                    });
+                };
+            });
+        });
+    </script>
+</body>
+
+</html>
