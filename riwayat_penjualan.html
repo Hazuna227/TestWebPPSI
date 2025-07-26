@@ -165,7 +165,6 @@
                             <th>Kategori</th>
                             <th>Jumlah</th>
                             <th>Tanggal</th>
-                            <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -175,10 +174,6 @@
                             <td>Mobil</td>
                             <td>50</td>
                             <td>2025-07-01</td>
-                            <td>
-                                <div class="action-buttons"><button class="btn-edit">Edit</button><button
-                                        class="btn-delete">Hapus</button></div>
-                            </td>
                         </tr>
                         <tr>
                             <td>2</td>
@@ -186,10 +181,6 @@
                             <td>Motor</td>
                             <td>30</td>
                             <td>2025-07-04</td>
-                            <td>
-                                <div class="action-buttons"><button class="btn-edit">Edit</button><button
-                                        class="btn-delete">Hapus</button></div>
-                            </td>
                         </tr>
                         <tr>
                             <td>3</td>
@@ -197,10 +188,6 @@
                             <td>Truk</td>
                             <td>20</td>
                             <td>2025-06-15</td>
-                            <td>
-                                <div class="action-buttons"><button class="btn-edit">Edit</button><button
-                                        class="btn-delete">Hapus</button></div>
-                            </td>
                         </tr>
                         <tr>
                             <td>4</td>
@@ -208,10 +195,6 @@
                             <td>Mobil</td>
                             <td>45</td>
                             <td>2025-07-10</td>
-                            <td>
-                                <div class="action-buttons"><button class="btn-edit">Edit</button><button
-                                        class="btn-delete">Hapus</button></div>
-                            </td>
                         </tr>
                         <tr>
                             <td>5</td>
@@ -219,10 +202,6 @@
                             <td>Motor</td>
                             <td>25</td>
                             <td>2025-06-20</td>
-                            <td>
-                                <div class="action-buttons"><button class="btn-edit">Edit</button><button
-                                        class="btn-delete">Hapus</button></div>
-                            </td>
                         </tr>
                         <tr>
                             <td>6</td>
@@ -230,10 +209,6 @@
                             <td>Truk</td>
                             <td>15</td>
                             <td>2025-07-03</td>
-                            <td>
-                                <div class="action-buttons"><button class="btn-edit">Edit</button><button
-                                        class="btn-delete">Hapus</button></div>
-                            </td>
                         </tr>
                         <tr>
                             <td>7</td>
@@ -241,10 +216,6 @@
                             <td>Mobil</td>
                             <td>70</td>
                             <td>2025-05-15</td>
-                            <td>
-                                <div class="action-buttons"><button class="btn-edit">Edit</button><button
-                                        class="btn-delete">Hapus</button></div>
-                            </td>
                         </tr>
                         <tr>
                             <td>8</td>
@@ -252,45 +223,11 @@
                             <td>Motor</td>
                             <td>20</td>
                             <td>2025-07-06</td>
-                            <td>
-                                <div class="action-buttons"><button class="btn-edit">Edit</button><button
-                                        class="btn-delete">Hapus</button></div>
-                            </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </main>
-    </div>
-
-    <!-- Modal -->
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">Edit Data Penjualan</div>
-            <div class="modal-body">
-                <input type="text" id="editNama" placeholder="Nama Barang">
-                <input type="text" id="editKategori" placeholder="Kategori">
-                <input type="number" id="editJumlah" placeholder="Jumlah">
-                <input type="date" id="editTanggal" placeholder="Tanggal">
-            </div>
-            <div class="modal-footer">
-                <button class="btn-cancel" onclick="closeModal()">Batal</button>
-                <button class="btn-ok" onclick="confirmEdit()">OK</button>
-            </div>
-        </div>
-    </div>
-    <!-- Tambahan Modal Konfirmasi Hapus -->
-    <div id="deleteModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">Konfirmasi Hapus</div>
-            <div class="modal-body">
-                <p>Apakah Anda yakin ingin menghapus data ini?</p>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-cancel" onclick="closeDeleteModal()">Batal</button>
-                <button class="btn-ok" onclick="confirmDelete()">Hapus</button>
-            </div>
-        </div>
     </div>
 
     <script>
@@ -316,55 +253,7 @@
                     }
                 ]
             });
-
-            // Tombol Edit
-            $('.btn-edit').on('click', function () {
-                const row = $(this).closest('tr');
-                currentRow = row;
-
-                $('#editNama').val(row.find('td:eq(1)').text());
-                $('#editKategori').val(row.find('td:eq(2)').text());
-                $('#editJumlah').val(row.find('td:eq(3)').text());
-                $('#editTanggal').val(row.find('td:eq(4)').text());
-
-                $('#editModal').fadeIn();
-            });
-
-            // Tombol Hapus
-            $('.btn-delete').on('click', function () {
-                rowToDelete = $(this).closest('tr');
-                $('#deleteModal').fadeIn();
-            });
         });
-
-        function closeModal() {
-            $('#editModal').fadeOut();
-        }
-
-        function closeDeleteModal() {
-            $('#deleteModal').fadeOut();
-        }
-
-        function confirmEdit() {
-            if (currentRow) {
-                currentRow.find('td:eq(1)').text($('#editNama').val());
-                currentRow.find('td:eq(2)').text($('#editKategori').val());
-                currentRow.find('td:eq(3)').text($('#editJumlah').val());
-                currentRow.find('td:eq(4)').text($('#editTanggal').val());
-            }
-
-            alert('Edit selesai!');
-            closeModal();
-        }
-
-        function confirmDelete() {
-            if (rowToDelete) {
-                table.row(rowToDelete).remove().draw(); // Hapus pakai API DataTable
-                rowToDelete = null;
-            }
-            $('#deleteModal').fadeOut();
-            alert('Data berhasil dihapus!');
-        }
     </script>
 
 
